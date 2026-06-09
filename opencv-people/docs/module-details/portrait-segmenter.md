@@ -13,9 +13,9 @@ updated: 2026-06-09
 
 ## 类职责
 
-对 `DeepLabV3Segmenter` 的高层封装，提供更便捷的接口：
+对 `DeepLabV3Segmenter` 的高层封装，提供更便捷接口：
 - 文件路径级别的单图分割（自动读取/保存文件）
-- 支持多种背景替换模式
+- 支持透明背景和纯色背景两类输出
 - 对外屏蔽底层 Tensor/OpenCV 细节
 
 ---
@@ -28,13 +28,13 @@ PortraitSegmenter(device='cpu')
 
 内部初始化 `self.segmenter = DeepLabV3Segmenter(device)`。
 
-⚠️ **注意**：`app.py` 中通过 `segmenter.segmenter` 访问底层模型实例，而非通过本类的封装方法（见 `implicit-knowledge.md` #1）。
+⚠️ 注意：`app.py` 里通过 `segmenter.segmenter` 访问底层模型实例，而不是只使用本类封装方法。
 
 ---
 
 ## 方法
 
-### `segment_image(image_path, output_path=None, bg_replace=None) → (mask, result)`
+### `segment_image(image_path, output_path=None, bg_replace=None) -> (mask, result)`
 
 从文件路径读取图像，分割后可选择保存结果。
 
@@ -45,20 +45,22 @@ PortraitSegmenter(device='cpu')
 | `bg_replace` | BGR tuple \| `'transparent'` \| None | 背景处理方式 |
 
 `bg_replace` 取值说明：
-- `None`：不替换背景，返回人像区域绿色高亮叠加图
+- `None`：返回人像绿色高亮叠加图
 - `'transparent'`：调用 `extract_portrait()`，返回 BGRA
-- `(B,G,R)` 元组：调用 `remove_background()`，替换为纯色
+- `(B,G,R)`：调用 `remove_background()`，替换纯色背景
 
-返回：`(mask, result)`，读取失败时返回 `(None, None)`
+返回值：`(mask, result)`；读取失败时返回 `(None, None)`。
 
-### `segment_with_mask(image, mask=None) → mask`
+### `segment_with_mask(image, mask=None) -> mask`
 
 对已有 numpy 图像做分割。若 `mask` 不为 None 则直接返回，否则调用 `self.segmenter.segment(image)`。
-
-**使用场景**：需要传入自定义掩码时绕过模型推理。
 
 ---
 
 ## 与 app.py 的关系
 
-`app.py` 加载 `PortraitSegmenter` 实例后，**绕过了封装方法**，直接通过 `segmenter.segmenter.segment()` 调用底层方法。这意味着 `segment_image()` 的文件路径接口在 Web UI 中**未被使用**，主要用于脚本场景。
+当前最简 `app.py` 主流程直接调用：
+- `segmenter.segmenter.segment(image)`
+- `segmenter.segmenter.extract_portrait(image, mask)`
+
+因此 `segment_image()` 目前更适合在脚本或二次开发场景中复用。
