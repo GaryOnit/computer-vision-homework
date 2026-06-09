@@ -1,0 +1,9 @@
+skill-manifest-version: 1
+skill-id: 26772fc653a49f631f21245257ac6321f2e321a370f682036837612efcc3ad3a
+
+files:
+  09c32a09ffb259c988c07285a4e06b9763870a29de957c930d7889ab3960ea75  SKILL.md
+  3557c23d6b8d1945967186f8bea523f4c3403a9228945f02a1a761cadcce3329  evals/evals.json
+  bfcdcf954e60e00c149b111df1d8989da94b48821633883b949a6fbece397655  references/doc-templates.md
+  a19510ca41d45e3e864dfec201ad60b3272721ab258ade8cf75f1d54d7ccfd77  references/operations-guide.md
+  6b529983a87f35080d623ae1471eb8cffe6d31a8b082d6d40f51134286f74ee3  references/workflow-detail.md

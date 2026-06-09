@@ -1,0 +1,166 @@
+[
+  {
+    "id": "eval-01",
+    "description": "新仓库建库全流程：触发词识别 + 输出正确文件树",
+    "prompt": "帮我为 data-service 这个 Android 仓库从零建一个 AI 可用的知识库，包含所有 Service 和 API 文档。",
+    "expected_behavior": {
+      "must_include_steps": [
+        "nvm use 18",
+        "list_dir 或目录扫描",
+        "读取 Service 文件",
+        "docs/service-api-index.md",
+        "docs/quick-lookup.md",
+        "docs/implicit-knowledge.md",
+        "AGENTS.md"
+      ],
+      "must_not_do": [
+        "一次性读取所有 Java 文件（批量超过 10 个）",
+        "不扫描目录直接开始写文档",
+        "跳过 implicit-knowledge.md"
+      ],
+      "must_produce": [
+        "docs/README.md（含目录）",
+        "docs/service-api-index.md（Service↔API 表格）",
+        "docs/quick-lookup.md（业务场景→文件映射）",
+        "AGENTS.md（含 P0/P1 优先级声明）"
+      ]
+    },
+    "grading_criteria": "输出的 docs/service-api-index.md 必须有 ≥20 个 Service，AGENTS.md 必须含 P0/P1/P2 分级，implicit-knowledge.md 必须记录 ≥5 条已知坑"
+  },
+  {
+    "id": "eval-02",
+    "description": "工具环境检查：Node 版本问题处理",
+    "prompt": "我要为项目建知识库，需要读取学城文档（km.sankuai.com/collabpage/2758014734），你会怎么操作？",
+    "expected_behavior": {
+      "must_include": [
+        "nvm use 18",
+        "oa-skills citadel getMarkdown",
+        "head -200 或截断处理"
+      ],
+      "must_not_include": [
+        "直接运行 oa-skills 不切换 Node 版本",
+        "全量读取大文档"
+      ]
+    },
+    "grading_criteria": "必须先执行 nvm use 18，必须对大文档使用截断策略"
+  },
+  {
+    "id": "eval-03",
+    "description": "增量更新：新增模块后同步更新所有索引",
+    "prompt": "我在 data-service 里新增了一个 CouponService 模块，如何更新知识库？",
+    "expected_behavior": {
+      "must_update": [
+        "docs/service-api-index.md",
+        "docs/file-index.md",
+        "docs/quick-lookup.md",
+        "docs/README.md"
+      ],
+      "must_warn_about": [
+        "README.md 目录同步（最常遗漏）"
+      ],
+      "must_not_do": [
+        "只更新 service-api-index.md 而遗漏 README"
+      ]
+    },
+    "grading_criteria": "必须列出全部 4 个需要更新的文件，必须提醒 README.md 目录同步"
+  },
+  {
+    "id": "eval-04",
+    "description": "运营场景-踩坑自动沉淀：识别用户纠偏信号",
+    "prompt": "（场景：AI 刚才把 ReviewFragment 的参数顺序搞错了，用户说"不对，dealId 应该传空字符串不是 null"）用户说：不对，你搞错了，dealId 在 POI 详情页应该传 \"\" 不是 null。",
+    "expected_behavior": {
+      "must_do": [
+        "识别到纠偏信号",
+        "完成当前主任务修复后，静默写入踩坑文件",
+        "写入路径包含 docs/experience/",
+        "踩坑文件有 frontmatter（topic/confidence: L3/source）",
+        "判断是否需要同步更新 implicit-knowledge.md"
+      ],
+      "must_not_do": [
+        "打断当前任务去沉淀",
+        "忘记写踩坑文件",
+        "踩坑文件缺少 frontmatter"
+      ]
+    },
+    "grading_criteria": "必须识别纠偏信号，必须在主任务完成后写入 docs/experience/ 下的踩坑文件，frontmatter 完整"
+  },
+  {
+    "id": "eval-05",
+    "description": "运营场景-规则检查（rule-check）：输出 R1~R16 报告",
+    "prompt": "rule-check",
+    "expected_behavior": {
+      "must_do": [
+        "扫描 AGENTS.md",
+        "按 R1~R16 逐条检查",
+        "输出带优先级（🔴/🟡/🟠）的问题报告",
+        "每条问题给出修复提案",
+        "提示用户选择 apply all 或指定编号"
+      ],
+      "must_not_do": [
+        "直接修改 AGENTS.md 不等用户确认",
+        "只输出问题不给修复建议"
+      ]
+    },
+    "grading_criteria": "必须输出分优先级的检查报告，必须在用户确认后才执行修改"
+  },
+  {
+    "id": "eval-06",
+    "description": "运营场景-doc-check：检查知识库文档质量",
+    "prompt": "doc-check",
+    "expected_behavior": {
+      "must_do": [
+        "扫描 docs/ 目录下所有 .md 文件",
+        "按 D1~D16 检查项逐文件检查",
+        "输出问题报告（文件级 D1~D11 + 目录级 D12~D16）",
+        "给出修复提案",
+        "等待用户确认后再执行修改"
+      ],
+      "must_not_do": [
+        "直接修改文件不等待确认",
+        "只检查部分文件跳过其他"
+      ]
+    },
+    "grading_criteria": "必须检查 docs/ 所有文件，必须分优先级输出，必须等用户确认后修改"
+  },
+  {
+    "id": "eval-07",
+    "description": "运营场景-struct-check：代码目录结构检查",
+    "prompt": "struct-check",
+    "expected_behavior": {
+      "must_do": [
+        "扫描仓库代码目录（非 docs/）",
+        "按 S1~S9 检查项",
+        "检查 S1：AGENTS.md 是否存在",
+        "检查 S8：文件名与类名是否一致",
+        "输出带优先级的报告",
+        "等待用户确认后执行修改"
+      ],
+      "must_not_do": [
+        "扫描 docs/ 目录（这是 doc-check 的范围）",
+        "直接重命名文件不等待确认"
+      ]
+    },
+    "grading_criteria": "必须检查 S1（AGENTS.md 缺失）和 S8（文件名与类名不一致），不能混入 docs/ 检查，必须等用户确认后执行"
+  },
+  {
+    "id": "eval-08",
+    "description": "运营场景-rule-init：智能合并不覆盖独有内容",
+    "prompt": "rule-init（仓库已有 AGENTS.md，其中有一条独有规则：ViewModel 必须继承 BaseViewModel）",
+    "expected_behavior": {
+      "must_do": [
+        "读取现有 AGENTS.md",
+        "识别并保留独有规则（ViewModel 继承约束）",
+        "智能合并标准章节",
+        "展示 diff 摘要",
+        "等待用户确认后写入",
+        "输出质量检查报告"
+      ],
+      "must_not_do": [
+        "直接覆盖整个 AGENTS.md",
+        "丢失独有规则 ViewModel 继承约束",
+        "不展示 diff 直接写入"
+      ]
+    },
+    "grading_criteria": "必须保留独有规则，必须展示 diff 后等用户确认，必须输出质量检查报告"
+  }
+]
