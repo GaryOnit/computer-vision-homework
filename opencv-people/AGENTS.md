@@ -9,15 +9,16 @@
 **opencv-people** 是一个基于 DeepLabV3 的命令行人像分割工具。
 核心能力：输入本地图片路径，输出透明背景人像 PNG。
 
-**启动命令**：
+**启动命令（macOS/Linux）**：
 ```bash
 cd /Users/megumi/Desktop/code/computer-vision/opencv-people
 ./venv/bin/python app.py people.jpg
 ```
 
-如果在 macOS + Homebrew Python 环境遇到 `pyexpat` 相关动态库问题，使用：
-```bash
-DYLD_LIBRARY_PATH=/opt/homebrew/lib ./venv/bin/python app.py people.jpg
+**启动命令（Windows PowerShell）**：
+```powershell
+cd D:\path\to\opencv-people
+.\venv\Scripts\python.exe app.py people.jpg
 ```
 
 ---

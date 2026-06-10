@@ -44,6 +44,8 @@ updated: 2026-06-09
 
 ## 启动方式
 
+### macOS/Linux
+
 ```bash
 cd /Users/megumi/Desktop/code/computer-vision/opencv-people
 ./venv/bin/python app.py people.jpg
@@ -53,4 +55,11 @@ macOS + Homebrew Python 若遇到 `pyexpat` 动态库问题，使用：
 
 ```bash
 DYLD_LIBRARY_PATH=/opt/homebrew/lib ./venv/bin/python app.py people.jpg
+```
+
+### Windows (PowerShell)
+
+```powershell
+cd D:\path\to\opencv-people
+.\venv\Scripts\python.exe app.py people.jpg
 ```
